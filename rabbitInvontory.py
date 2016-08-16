@@ -46,22 +46,22 @@ class Piui(object):
         self.title = self.page.add_textbox('Gender:', 'h1')
         self.genderTxt = self.page.add_input('text')
         self.list = self.page.add_list()
-        self.list.add_item('Fixed:', chevron=True, toggle=False, ontoggle=functools.partial(self._toggle, 'fixed'))
-        self.list.add_item('Litter box Trained:', chevron=True, toggle=False, ontoggle=functools.partial(self._toggle,
+        self.list.add_item('Fixed:', chevron=False, toggle=True, ontoggle=functools.partial(self._toggle, 'fixed'))
+        self.list.add_item('Litter box Trained:', chevron=False, toggle=True, ontoggle=functools.partial(self._toggle,
                                                                                                          'litter'))
-        self.list.add_item('Adaptable:', chevron=True, toggle=False, ontoggle=functools.partial(self._toggle,
+        self.list.add_item('Adaptable:', chevron=False, toggle=True, ontoggle=functools.partial(self._toggle,
                                                                                                 'adaptable'))
         self.title = self.page.add_textbox('Bio:', 'h1')
         self.BioTxt = self.page.add_input('text')
 
-    def _main_menu(self):
+    def _main_menu_(self):
         self.page = self.ui.new_ui_page(title='Rabbit Inventory')
         self.list = self.page.add_list()
         self.list.add_item('Add Bunny', chevron=True, onclick=self._add_bun_page)
         self.ui.done()
 
     def _main_(self):
-        self._main_menu()
+        self._main_menu_()
         self.ui.done()
 
 

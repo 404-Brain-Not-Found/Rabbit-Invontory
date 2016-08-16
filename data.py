@@ -6,17 +6,22 @@ import functools
 
 
 class Data(object):
-    def _add_bun(self, name, breed, mass, age, dateIn, gender, fixed, litter, problemList, housing, adopted, bio, dateOut = " ", Id = 0):
+    def __init__(self):
+        directory = '/home/pi/Documents/Rabbit_Invontory'
+
+    def _add_bun(self, name, breed, mass, age, dateIn, gender, fixed, litter, problemList, housing, adopted, bio,
+                 dateOut = " ", Id = 0):
         # Create any missing information in system
         year = dateIn[len(dateIn) - 4:len(dateIn)]
         global directory
 
         if Id == 0:
             try:
-                numInYear = np.load('C:/Users/thomq/Desktop/Rabbit-invontory/Essential/' + ('Number_in_' + str(year)) + '.npy')
+                numInYear = np.load('/home/pi/Documents/Rabbit_Invontory/Python_Storage/Number_in_' + str(year) +
+                                    '.npy')
             except IOError:
                 numInYear = [0, 0]
-                np.save('C:/Users/thomq/Desktop/Rabbit-invontory/Essential/' + ('Number_in_' + str(year)), numInYear)
+                np.save('/home/pi/Documents/Rabbit_Invontory/Python_Storage/Number_in_' + str(year), numInYear)
             year = str(year)
             print adopted
             if not os.path.isdir('C:/Users/thomq/Desktop/Rabbit-invontory/Rabbit/' + year):
@@ -108,3 +113,43 @@ class Data(object):
 
         os.remove(completeName)
         return name, Id, breed, wieght, age, dayOfAvrival, dayOfDeparture, gender, fixed, litter, problem, adpotable, housing, bio
+
+    def _generate_stats(self, year):
+        numberInYear = np.load('/home/pi/Documents/Rabbit_Invontory/Python_Storage/Number_in_' + str(year) + '.npy')
+        numberOutYear = [0, 0]
+        for yearFolder in os.listdir('/home/pi/Documents/Rabbit_Invontory/Rabbits'):
+            for bun in os.listdir('/home/pi/Documents/Rabbit_Invontory/Rabbits/' + yearFolder):
+                name, Id, breed, wieght, age, dayOfAvrival, dayOfDeparture, gender, fixed, litter, problem, adpotable, housing, bio = self._pull_bun_data(bun)
+                if int(dayOfDeparture[len(dayOfDeparture)-4:len(dayOfDeparture)]) == int(year):
+                    if gender == 'Male':
+                        numberOutYear[1] += 1
+                    else:
+                        numberOutYear[0] += 1
+        return numberInYear[0], numberInYear[1], numberOutYear[0], numberOutYear[1]
+
+    def _get_stats(self, year):
+        try:
+            data = open('/home/pi/Documents/Rabbit_Invontory/Rabbits_Stats/' + year + '.txt', 'r+')
+            lines = []
+            count = 0
+            for line in data:
+                lines[count] = line
+                count += 1
+            femaleIn = lines[0]
+            femaleIn = femaleIn[len('Females In: '):len(femaleIn)]
+            maleIn = lines[1]
+            maleIn = maleIn[len('Males In: '):len(maleIn)]
+            femaleOut = lines[2]
+            femaleOut = femaleOut[len('Females Out: '): len(femaleOut)]
+            maleOut = lines[3]
+            maleOut = maleOut[len('Males Out: '): len(maleOut)]
+            return femaleIn, maleIn, femaleOut, maleOut
+        except IOError:
+            femaleIn, maleIn, femaleOut, maleOut = self._generate_stats(year)
+            data = open('/home/pi/Documents/Rabbit_Invontory/Rabbits_Stats/' + year + '.txt', 'w')
+            data.write('Females In: ' + str(femaleIn) + '\n')
+            data.write('Males In: ' + str(maleIn) + '\n')
+            data.write('Females Out: ' + str(femaleOut) + '\n')
+            data.write('Males Out: ' + str(maleOut) + '\n')
+            data.close()
+            return femaleIn, maleIn, femaleOut, maleOut
